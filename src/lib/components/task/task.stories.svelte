@@ -32,6 +32,9 @@
 			on:change
 			on:change={handleChange}
 			on:titleChange={handleTitleChange}
+			on:moveUp={console.log}
+			on:moveDown={console.log}
+			on:delete={console.log}
 		/>
 	</ul>
 </Template>

@@ -27,6 +27,7 @@ You can preview the production build with `npm run preview`.
 
 ### current
 - UI component for task
+- Storybook for Svelte
 
 ### todo
 - PWA to cache data + assets
@@ -43,5 +44,4 @@ You can preview the production build with `npm run preview`.
 - UI component to switch lists
 - UI component for settings
 - UI: home
-- Storybook for Svelte
 - UI: add up, down, delete to Task
