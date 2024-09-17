@@ -26,8 +26,7 @@ You can preview the production build with `npm run preview`.
 ## tasks
 
 ### current
-- UI component for task
-- Storybook for Svelte
+- UI component for task list (day's worth of task)
 
 ### todo
 - PWA to cache data + assets
@@ -37,7 +36,6 @@ You can preview the production build with `npm run preview`.
 - fetch from dropbox
 - save to dropbox
 - save to localStorage as alternative to dropbox
-- UI component for task list (day's worth of task)
 - UI component for date
 - UI component to add new task
 - UI component scroll dates
@@ -45,3 +43,7 @@ You can preview the production build with `npm run preview`.
 - UI component for settings
 - UI: home
 - UI: add up, down, delete to Task
+
+### done
+- UI component for task
+- Storybook for Svelte

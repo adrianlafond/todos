@@ -22,7 +22,7 @@
 </script>
 
 <Template let:args>
-	<ul>
+	<ul class="w-96 max-w-96">
 		<!--👇 'on:click' allows to forward event to addon-actions  -->
 		<Task
 			{...args}

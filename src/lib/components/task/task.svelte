@@ -107,13 +107,19 @@
 		}
 	}
 
-	function handleSettingsEvent(eventType: 'moveUp' | 'moveDown' | 'delete') {
-		if (eventType === 'delete') {
-			handleSettingsClose();
-		} else {
-			resetSettingsTimer();
-		}
-		dispatch(eventType, { id });
+	function handleMoveUp() {
+		resetSettingsTimer();
+		dispatch('moveUp', { id });
+	}
+
+	function handleMoveDown() {
+		resetSettingsTimer();
+		dispatch('moveDown', { id });
+	}
+
+	function handleDelete() {
+		handleSettingsClose();
+		dispatch('delete', { id });
 	}
 </script>
 
@@ -124,7 +130,7 @@
 	-->
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <li
-	class="relative inline-flex w-96 max-w-96 rounded bg-white hover:bg-slate-100 transition-colors duration-200 focus-within:bg-slate-200"
+	class="w-full relative inline-flex rounded bg-white hover:bg-slate-100 transition-colors duration-200 focus-within:bg-slate-200"
 	on:keydown={handleCheckboxKeydown}
 >
 	<label
@@ -147,25 +153,13 @@
 				<IconButton autofocus tabindex="-1" label="edit task title" on:click={handleTitleEditStart}>
 					<Edit />
 				</IconButton>
-				<IconButton
-					tabindex="-1"
-					label="move task up"
-					on:click={() => handleSettingsEvent('moveUp')}
-				>
+				<IconButton tabindex="-1" label="move task up" on:click={handleMoveUp}>
 					<Up />
 				</IconButton>
-				<IconButton
-					tabindex="-1"
-					label="move task down"
-					on:click={() => handleSettingsEvent('moveDown')}
-				>
+				<IconButton tabindex="-1" label="move task down" on:click={handleMoveDown}>
 					<Down />
 				</IconButton>
-				<IconButton
-					tabindex="-1"
-					label="delete task"
-					on:click={() => handleSettingsEvent('delete')}
-				>
+				<IconButton tabindex="-1" label="delete task" on:click={handleDelete}>
 					<Delete />
 				</IconButton>
 				<IconButton tabindex="-1" label="close task settings" on:click={handleSettingsClose}>
