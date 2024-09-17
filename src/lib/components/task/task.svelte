@@ -16,22 +16,38 @@
 	export let title: string;
 	export let checked = false;
 
-	let editing = false;
+	let titleEditing = false;
 	let settingsOpen = false;
 	let settingsTimeout = 0;
+	let settingsBar: HTMLDivElement;
 
 	function handleChange(event: Event) {
 		dispatch('change', { id, checked: (event.target as HTMLInputElement).checked });
 	}
 
-	function handleEditStart() {
-		editing = true;
+	function handleTitleEditStart() {
+		console.log('handleTitleEditStart()');
+		titleEditing = true;
 		handleSettingsClose();
+	}
+
+	function handleTitleUpdate({ detail }: { detail: { value: string } }) {
+		titleEditing = false;
+		dispatch('titleChange', { id, title: detail.value });
+	}
+
+	function resetSettingsTimer() {
+		clearTimeout(settingsTimeout);
+		settingsTimeout = setTimeout(handleSettingsClose, 5000);
 	}
 
 	function handleSettingsOpen() {
 		settingsOpen = true;
-		settingsTimeout = setTimeout(handleSettingsClose, 5000);
+		resetSettingsTimer();
+	}
+
+	function handleSettingsOpenClick() {
+		handleSettingsOpen();
 	}
 
 	function handleSettingsClose() {
@@ -39,41 +55,125 @@
 		clearTimeout(settingsTimeout);
 	}
 
-	function handleTitleUpdate({ detail }: { detail: { value: string } }) {
-		editing = false;
-		dispatch('titleChange', { id, title: detail.value });
+	function moveSettingsFocus(direction: 'next' | 'prev') {
+		if (!settingsBar) {
+			return;
+		}
+		resetSettingsTimer();
+		const buttons = Array.from(settingsBar.querySelectorAll('button'));
+		const activeIndex = buttons.findIndex((btn) => document.activeElement === btn);
+		if (direction === 'next') {
+			moveSettingsFocusNext(buttons, activeIndex);
+		} else {
+			moveSettingsFocusPrev(buttons, activeIndex);
+		}
+	}
+
+	function moveSettingsFocusNext(buttons: HTMLButtonElement[], activeIndex: number) {
+		if (activeIndex === -1) {
+			buttons[0].focus();
+		} else {
+			buttons[(activeIndex + 1) % buttons.length].focus();
+		}
+	}
+
+	function moveSettingsFocusPrev(buttons: HTMLButtonElement[], activeIndex: number) {
+		if (activeIndex === -1) {
+			buttons[buttons.length - 1].focus();
+		} else {
+			let index = activeIndex - 1 < 0 ? buttons.length - 1 : activeIndex - 1;
+			buttons[index].focus();
+		}
+	}
+
+	function handleCheckboxKeydown(event: KeyboardEvent) {
+		if (titleEditing) {
+			return;
+		}
+		if (event.key === 'Enter' && !settingsOpen) {
+			event.preventDefault();
+			handleSettingsOpen();
+		} else if (settingsOpen) {
+			if (event.key === 'Escape') {
+				event.preventDefault();
+				handleSettingsClose();
+			} else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+				event.preventDefault();
+				moveSettingsFocus('next');
+			} else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+				event.preventDefault();
+				moveSettingsFocus('prev');
+			}
+		}
+	}
+
+	function handleSettingsEvent(eventType: 'moveUp' | 'moveDown' | 'delete') {
+		if (eventType === 'delete') {
+			handleSettingsClose();
+		} else {
+			resetSettingsTimer();
+		}
+		dispatch(eventType, { id });
 	}
 </script>
 
+<!--
+	Why svelte-ignore a11y-no-noninteractive-element-interactions? Because the LI
+  handles keyboard interactions within this component to adhere to keyboard
+	accessibility guidelines for within a component. See https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#keyboardnavigationinsidecomponents
+	-->
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <li
-	class="relative inline-flex w-96 max-w-96 pl-2 pt-2 pb-2 pr-8 rounded bg-white hover:bg-slate-100 transition-colors duration-200"
+	class="relative inline-flex w-96 max-w-96 rounded bg-white hover:bg-slate-100 transition-colors duration-200 focus-within:bg-slate-200"
+	on:keydown={handleCheckboxKeydown}
 >
-	<label class="flex items-start">
+	<label
+		class={cx('flex items-start pl-2 pt-2 pb-2', {
+			'flex-1 pr-8': !titleEditing
+		})}
+	>
 		<input class="mr-1 mt-1" bind:checked type="checkbox" on:change={handleChange} />
-		{#if !editing}<span class="inline-block leading-tight">{title}</span>{/if}
+		{#if !titleEditing}<span class="inline-block leading-tight flex-1">{title}</span>{/if}
 	</label>
-	{#if editing}
-		<MultilineTextbox defaultValue={title} on:update={handleTitleUpdate} />
+	{#if titleEditing}
+		<MultilineTextbox class="flex-1 mr-8 my-2" defaultValue={title} on:update={handleTitleUpdate} />
 	{/if}
 	<div class="absolute right-0 top-0 h-9 items-center inline-flex">
-		{#if settingsOpen && !editing}
-			<div class="inline-flex items-center justify-between gap-1 rounded bg-white mr-0.5">
-				<IconButton label="edit task title" on:click={handleEditStart}><Edit /></IconButton>
-				<IconButton label="move task up" on:click={() => dispatch('moveUp', { id })}>
+		{#if settingsOpen && !titleEditing}
+			<div
+				class="inline-flex items-center justify-between gap-1 rounded bg-white mr-0.5"
+				bind:this={settingsBar}
+			>
+				<IconButton autofocus tabindex="-1" label="edit task title" on:click={handleTitleEditStart}>
+					<Edit />
+				</IconButton>
+				<IconButton
+					tabindex="-1"
+					label="move task up"
+					on:click={() => handleSettingsEvent('moveUp')}
+				>
 					<Up />
 				</IconButton>
-				<IconButton label="move task down" on:click={() => dispatch('moveDown', { id })}>
+				<IconButton
+					tabindex="-1"
+					label="move task down"
+					on:click={() => handleSettingsEvent('moveDown')}
+				>
 					<Down />
 				</IconButton>
-				<IconButton label="delete task" on:click={() => dispatch('delete', { id })}>
+				<IconButton
+					tabindex="-1"
+					label="delete task"
+					on:click={() => handleSettingsEvent('delete')}
+				>
 					<Delete />
 				</IconButton>
-				<IconButton label="close task settings" on:click={handleSettingsClose}>
+				<IconButton tabindex="-1" label="close task settings" on:click={handleSettingsClose}>
 					<X />
 				</IconButton>
 			</div>
-		{:else if !editing}
-			<IconButton label="open task settings" on:click={handleSettingsOpen}>
+		{:else if !titleEditing}
+			<IconButton tabindex="-1" label="open task settings" on:click={handleSettingsOpenClick}>
 				<ThreeDotsVertical />
 			</IconButton>
 		{/if}

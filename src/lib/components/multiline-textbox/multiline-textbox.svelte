@@ -1,8 +1,12 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount } from 'svelte';
 	import autosize from 'autosize';
+	import cx from 'clsx';
 
 	export let defaultValue = '';
+
+	let className: string = '';
+	export { className as class };
 
 	const dispatch = createEventDispatcher();
 	let value = defaultValue;
@@ -26,6 +30,7 @@
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Enter' || event.key === 'Escape') {
 			event.preventDefault();
+			event.stopImmediatePropagation();
 			if (event.key === 'Escape') {
 				value = defaultValue;
 			}
@@ -35,7 +40,7 @@
 </script>
 
 <textarea
-	class="resize-none flex-1 leading-tight"
+	class={cx('resize-none leading-tight', className)}
 	rows={1}
 	bind:value
 	on:input={handleInput}
