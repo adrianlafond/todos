@@ -40,7 +40,7 @@
 </script>
 
 <textarea
-	class={cx('resize-none leading-tight', className)}
+	class={cx('resize-none leading-tight focus:outline-none bg-transparent', className)}
 	rows={1}
 	bind:value
 	on:input={handleInput}

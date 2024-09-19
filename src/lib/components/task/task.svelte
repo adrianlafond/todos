@@ -9,6 +9,7 @@
 	import X from '../icons/x.svelte';
 	import cx from 'clsx';
 	import MultilineTextbox from '../multiline-textbox/multiline-textbox.svelte';
+	import Checkbox from '../checkbox/checkbox.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -133,13 +134,23 @@
 	class="w-full relative inline-flex rounded bg-white hover:bg-slate-100 transition-colors duration-200 focus-within:bg-slate-200"
 	on:keydown={handleCheckboxKeydown}
 >
+	<!-- svelte-ignore a11y-label-has-associated-control -->
 	<label
-		class={cx('flex items-start pl-2 pt-2 pb-2', {
-			'flex-1 pr-8': !titleEditing
-		})}
+		class={cx(
+			'flex items-start pl-2 pt-2 pb-2 focus-within:text-neutral-950 hover:text-neutral-950',
+			{
+				'flex-1 pr-8': !titleEditing,
+				'text-neutral-400': checked
+			}
+		)}
 	>
-		<input class="mr-1 mt-1" bind:checked type="checkbox" on:change={handleChange} />
-		{#if !titleEditing}<span class="inline-block leading-tight flex-1">{title}</span>{/if}
+		<!-- <input class="mr-1 mt-1" bind:checked type="checkbox" on:change={handleChange} /> -->
+		<Checkbox class="mr-2 mt-0.5" bind:checked on:change={handleChange} />
+		{#if !titleEditing}
+			<span class={cx('inline-block leading-tight flex-1')}>
+				{title}
+			</span>
+		{/if}
 	</label>
 	{#if titleEditing}
 		<MultilineTextbox class="flex-1 mr-8 my-2" defaultValue={title} on:update={handleTitleUpdate} />
