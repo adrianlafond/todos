@@ -26,8 +26,6 @@ You can preview the production build with `npm run preview`.
 ## tasks
 
 ### current
-- UI component to add new task
-- UI checkbox component
 
 ### todo
 - PWA to cache data + assets
@@ -41,10 +39,13 @@ You can preview the production build with `npm run preview`.
 - UI component to switch lists
 - UI component for settings
 - UI: home
+- write tests for UI compponents
 
 ### done
+- UI component to add new task
 - style multiline UI component
 - UI component for task list (day's worth of task)
 - UI: add up, down, delete to Task
 - UI component for task
 - Storybook for Svelte
+- UI checkbox component

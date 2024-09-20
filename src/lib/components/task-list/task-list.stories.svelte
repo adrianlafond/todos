@@ -9,7 +9,9 @@
 	import { Story, Template } from '@storybook/addon-svelte-csf';
 	import { TaskList } from './index';
 	import { type TaskEvent } from '../task';
+	import type { AddNewTaskEvent } from '../add-new-task';
 
+	let n = 3;
 	let list = [
 		{
 			id: 'task-0',
@@ -58,6 +60,17 @@
 		list = list.filter((item) => item.id !== detail.id);
 	}
 
+	function addTask({ detail }: AddNewTaskEvent) {
+		list = [
+			...list,
+			{
+				id: `task-${n++}`,
+				title: detail.value,
+				checked: false
+			}
+		];
+	}
+
 	function reset() {
 		list = listForRest.slice();
 	}
@@ -67,6 +80,7 @@
 	<TaskList
 		{...args}
 		bind:list
+		on:addNewTask={addTask}
 		on:deleteTask={deleteTask}
 		on:moveTaskUp={moveTaskUp}
 		on:moveTaskDown={moveTaskDown}

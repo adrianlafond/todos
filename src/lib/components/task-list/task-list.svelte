@@ -39,6 +39,6 @@
 				on:delete={handleDelete}
 			/>
 		{/each}
+		<AddNewTask on:addNewTask />
 	</ul>
-	<AddNewTask />
 </div>

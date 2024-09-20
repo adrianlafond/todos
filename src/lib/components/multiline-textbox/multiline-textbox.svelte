@@ -4,6 +4,7 @@
 	import cx from 'clsx';
 
 	export let defaultValue = '';
+	export let placeholder = '';
 
 	let className: string = '';
 	export { className as class };
@@ -47,4 +48,5 @@
 	on:blur={handleEditEnd}
 	on:keydown={handleKeyDown}
 	bind:this={textbox}
+	{placeholder}
 />
