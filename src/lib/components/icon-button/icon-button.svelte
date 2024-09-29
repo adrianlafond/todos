@@ -20,6 +20,7 @@
 
 <button
 	aria-label={label}
+	title={label}
 	class={cx('opacity-50 hover:opacity-100 transition-opacity duration-300 px-2 py-2', className)}
 	on:click
 	tabindex={+tabindex}

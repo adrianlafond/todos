@@ -6,10 +6,11 @@
 	import Down from '../icons/down.svelte';
 	import { IconButton } from '../icon-button';
 	import ThreeDotsVertical from '../icons/three-dots-vertical.svelte';
-	import X from '../icons/x.svelte';
 	import cx from 'clsx';
 	import MultilineTextbox from '../multiline-textbox/multiline-textbox.svelte';
 	import Checkbox from '../checkbox/checkbox.svelte';
+	import Copy from '../icons/copy.svelte';
+	import Cut from '../icons/cut.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -29,7 +30,7 @@
 	function handleTitleEditStart() {
 		console.log('handleTitleEditStart()');
 		titleEditing = true;
-		handleSettingsClose();
+		closeSettings();
 	}
 
 	function handleTitleUpdate({ detail }: { detail: { value: string } }) {
@@ -39,21 +40,25 @@
 
 	function resetSettingsTimer() {
 		clearTimeout(settingsTimeout);
-		settingsTimeout = setTimeout(handleSettingsClose, 5000);
+		settingsTimeout = window.setTimeout(closeSettings, 5000);
 	}
 
-	function handleSettingsOpen() {
+	function openSettings() {
 		settingsOpen = true;
 		resetSettingsTimer();
 	}
 
-	function handleSettingsOpenClick() {
-		handleSettingsOpen();
-	}
-
-	function handleSettingsClose() {
+	function closeSettings() {
 		settingsOpen = false;
 		clearTimeout(settingsTimeout);
+	}
+
+	function handleSettingsToggle() {
+		if (settingsOpen) {
+			closeSettings();
+		} else {
+			openSettings();
+		}
 	}
 
 	function moveSettingsFocus(direction: 'next' | 'prev') {
@@ -93,11 +98,11 @@
 		}
 		if (event.key === 'Enter' && !settingsOpen) {
 			event.preventDefault();
-			handleSettingsOpen();
+			openSettings();
 		} else if (settingsOpen) {
 			if (event.key === 'Escape') {
 				event.preventDefault();
-				handleSettingsClose();
+				closeSettings();
 			} else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
 				event.preventDefault();
 				moveSettingsFocus('next');
@@ -118,8 +123,16 @@
 		dispatch('moveDown', { id });
 	}
 
+	function handleCopy() {
+		dispatch('copy', { id });
+	}
+
+	function handleCut() {
+		dispatch('cut', { id });
+	}
+
 	function handleDelete() {
-		handleSettingsClose();
+		closeSettings();
 		dispatch('delete', { id });
 	}
 </script>
@@ -130,57 +143,63 @@
 	accessibility guidelines for within a component. See https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#keyboardnavigationinsidecomponents
 	-->
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<li
-	class="w-full relative inline-flex rounded bg-white hover:bg-slate-100 transition-colors duration-200 focus-within:bg-slate-200"
-	on:keydown={handleCheckboxKeydown}
->
-	<!-- svelte-ignore a11y-label-has-associated-control -->
-	<label
-		class={cx(
-			'flex items-start pl-2 pt-2 pb-2 focus-within:text-neutral-950 hover:text-neutral-950',
-			{
-				'flex-1 pr-8': !titleEditing,
-				'text-neutral-400': checked
-			}
-		)}
+<li class="w-full" on:keydown={handleCheckboxKeydown}>
+	<div
+		class="flex relative rounded bg-white hover:bg-slate-100 transition-colors duration-200 focus-within:bg-slate-200"
 	>
-		<!-- <input class="mr-1 mt-1" bind:checked type="checkbox" on:change={handleChange} /> -->
-		<Checkbox class="mr-2 mt-0.5" bind:checked on:change={handleChange} />
-		{#if !titleEditing}
-			<span class={cx('inline-block leading-tight flex-1')}>
-				{title}
-			</span>
+		<!-- svelte-ignore a11y-label-has-associated-control -->
+		<label
+			class={cx(
+				'flex items-start pl-2 pt-2 pb-2 focus-within:text-neutral-950 hover:text-neutral-950',
+				{
+					'flex-1 pr-8': !titleEditing,
+					'text-neutral-400': checked
+				}
+			)}
+		>
+			<Checkbox class="mr-2 mt-0.5" bind:checked on:change={handleChange} />
+			{#if !titleEditing}
+				<span class={cx('inline-block leading-tight flex-1')}>
+					{title}
+				</span>
+			{/if}
+		</label>
+		{#if titleEditing}
+			<MultilineTextbox
+				class="flex-1 mr-8 my-2"
+				defaultValue={title}
+				on:update={handleTitleUpdate}
+			/>
 		{/if}
-	</label>
-	{#if titleEditing}
-		<MultilineTextbox class="flex-1 mr-8 my-2" defaultValue={title} on:update={handleTitleUpdate} />
-	{/if}
-	<div class="absolute right-0 top-0 h-9 items-center inline-flex">
-		{#if settingsOpen && !titleEditing}
-			<div
-				class="inline-flex items-center justify-between gap-1 rounded bg-white mr-0.5"
-				bind:this={settingsBar}
-			>
-				<IconButton autofocus tabindex="-1" label="edit task title" on:click={handleTitleEditStart}>
-					<Edit />
-				</IconButton>
-				<IconButton tabindex="-1" label="move task up" on:click={handleMoveUp}>
-					<Up />
-				</IconButton>
-				<IconButton tabindex="-1" label="move task down" on:click={handleMoveDown}>
-					<Down />
-				</IconButton>
-				<IconButton tabindex="-1" label="delete task" on:click={handleDelete}>
-					<Delete />
-				</IconButton>
-				<IconButton tabindex="-1" label="close task settings" on:click={handleSettingsClose}>
-					<X />
-				</IconButton>
-			</div>
-		{:else if !titleEditing}
-			<IconButton tabindex="-1" label="open task settings" on:click={handleSettingsOpenClick}>
+		<div class="absolute right-0 top-0 h-9 items-center inline-flex">
+			<IconButton tabindex="-1" label="open task settings" on:click={handleSettingsToggle}>
 				<ThreeDotsVertical />
 			</IconButton>
-		{/if}
+		</div>
 	</div>
+	{#if settingsOpen && !titleEditing}
+		<div
+			class="flex items-center justify-end gap-1 rounded bg-white mr-0.5"
+			bind:this={settingsBar}
+		>
+			<IconButton tabindex="-1" label="delete task" on:click={handleDelete}>
+				<Delete />
+			</IconButton>
+			<IconButton tabindex="-1" label="move task up" on:click={handleMoveUp}>
+				<Up />
+			</IconButton>
+			<IconButton tabindex="-1" label="move task down" on:click={handleMoveDown}>
+				<Down />
+			</IconButton>
+			<IconButton tabindex="-1" label="move task down" on:click={handleCopy}>
+				<Copy />
+			</IconButton>
+			<IconButton tabindex="-1" label="move task down" on:click={handleCut}>
+				<Cut />
+			</IconButton>
+			<IconButton autofocus tabindex="-1" label="edit task title" on:click={handleTitleEditStart}>
+				<Edit />
+			</IconButton>
+		</div>
+	{/if}
 </li>

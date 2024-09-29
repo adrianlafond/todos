@@ -26,6 +26,7 @@ You can preview the production build with `npm run preview`.
 ## tasks
 
 ### current
+- UI component scroll dates
 
 ### todo
 - PWA to cache data + assets
@@ -35,13 +36,16 @@ You can preview the production build with `npm run preview`.
 - fetch from dropbox
 - save to dropbox
 - save to localStorage as alternative to dropbox
-- UI component scroll dates
 - UI component to switch lists
 - UI component for settings
 - UI: home
+- UI: open task submenu underneath task
+- UI: add copy and cut
+- UI: add paste
 - write tests for UI compponents
 
 ### done
+- UI task with options underneath
 - UI component to add new task
 - style multiline UI component
 - UI component for task list (day's worth of task)
