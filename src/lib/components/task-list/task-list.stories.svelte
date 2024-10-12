@@ -29,7 +29,6 @@
 			checked: false
 		}
 	];
-	const listForRest = list.slice();
 
 	function moveTaskUp({ detail }: TaskEvent) {
 		let index = list.findIndex((item) => item.id === detail.id);
@@ -70,10 +69,6 @@
 			}
 		];
 	}
-
-	function reset() {
-		list = listForRest.slice();
-	}
 </script>
 
 <Template let:args>
@@ -85,7 +80,6 @@
 		on:moveTaskUp={moveTaskUp}
 		on:moveTaskDown={moveTaskDown}
 	/>
-	<button on:click={reset}>Reset</button>
 </Template>
 
 <Story name="Basic" source args={{ title: 'Oct 31 2024 Thursday' }} />

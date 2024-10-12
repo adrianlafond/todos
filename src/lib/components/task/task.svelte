@@ -9,8 +9,6 @@
 	import cx from 'clsx';
 	import MultilineTextbox from '../multiline-textbox/multiline-textbox.svelte';
 	import Checkbox from '../checkbox/checkbox.svelte';
-	import Copy from '../icons/copy.svelte';
-	import Cut from '../icons/cut.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -123,14 +121,6 @@
 		dispatch('moveDown', { id });
 	}
 
-	function handleCopy() {
-		dispatch('copy', { id });
-	}
-
-	function handleCut() {
-		dispatch('cut', { id });
-	}
-
 	function handleDelete() {
 		closeSettings();
 		dispatch('delete', { id });
@@ -153,7 +143,8 @@
 				'flex items-start pl-2 pt-2 pb-2 focus-within:text-neutral-950 hover:text-neutral-950',
 				{
 					'flex-1 pr-8': !titleEditing,
-					'text-neutral-400': checked
+					'text-neutral-400': checked,
+					'line-through': checked
 				}
 			)}
 		>
@@ -190,12 +181,6 @@
 			</IconButton>
 			<IconButton tabindex="-1" label="move task down" on:click={handleMoveDown}>
 				<Down />
-			</IconButton>
-			<IconButton tabindex="-1" label="move task down" on:click={handleCopy}>
-				<Copy />
-			</IconButton>
-			<IconButton tabindex="-1" label="move task down" on:click={handleCut}>
-				<Cut />
 			</IconButton>
 			<IconButton autofocus tabindex="-1" label="edit task title" on:click={handleTitleEditStart}>
 				<Edit />
